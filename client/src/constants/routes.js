@@ -1,0 +1,15 @@
+export const ROUTES = Object.freeze({
+  LOGIN: "/login",
+  REGISTER: "/register",
+  NOT_FOUND: "/not-found",
+  STUDENT: "/student",
+  PROFILE: "/student/profile",
+  CREATE_PASS: "/student/passes/new",
+  HISTORY: "/student/passes",
+  SECURITY: "/security",
+  SCANNER: "/security/scanner",
+  SECURITY_PROFILE: "/security/profile",
+  ADMIN: "/admin",
+  STUDENTS: "/admin/students",
+  SECURITY_STAFF: "/admin/security-staff",
+});
