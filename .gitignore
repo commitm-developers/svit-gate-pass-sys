@@ -1,0 +1,34 @@
+# Dependencies
+**/node_modules/
+
+# Production/build output
+**/dist/
+**/build/
+**/coverage/
+**/.vite/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and runtime files
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.pid
+*.seed
+
+# Local caches
+.cache/
+.parcel-cache/
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+

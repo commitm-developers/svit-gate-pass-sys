@@ -1,0 +1,11 @@
+# Replace the usernames below with real GitHub handles.
+# Sensitive areas always request the Tech Lead.
+*                                 @vicky4t
+/server/src/middleware/           @vicky4t @backend-a
+/server/src/services/qr*          @vicky4t @backend-b
+/server/src/services/pass*        @vicky4t @backend-b
+/server/src/routes/scan*          @vicky4t @backend-b
+/server/src/jobs/                 @vicky4t @backend-b
+/client/src/features/auth/        @vicky4t @frontend-a
+/client/src/features/scanner/     @vicky4t @frontend-c
+/.github/                         @vicky4t

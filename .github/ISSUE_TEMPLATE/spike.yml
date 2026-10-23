@@ -1,0 +1,30 @@
+name: Spike / Research
+description: Time-boxed investigation to reduce uncertainty
+title: "[SPIKE] Question to answer"
+labels: ["spike"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question to answer
+      placeholder: "Can html5-qrcode scan reliably on low-end Android phones?"
+    validations:
+      required: true
+  - type: dropdown
+    id: timebox
+    attributes:
+      label: Time box
+      options: [Half day, 1 day, 2 days]
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Expected output
+      description: A short written recommendation, a proof-of-concept branch, or both.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Options to compare
