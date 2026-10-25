@@ -26,8 +26,14 @@ export function AuthProvider({ children }) {
     return nextUser;
   }, []);
 
-  const signIn = useCallback(async (credentials) => saveSession(await authApi.login(credentials)), [saveSession]);
-  const signUp = useCallback(async (details) => saveSession(await authApi.register(details)), [saveSession]);
+  const signIn = useCallback(
+    async (credentials) => saveSession(await authApi.login(credentials)),
+    [saveSession],
+  );
+  const signUp = useCallback(
+    async (details) => saveSession(await authApi.register(details)),
+    [saveSession],
+  );
   const logout = useCallback(() => {
     localStorage.removeItem("svit.accessToken");
     localStorage.removeItem("svit.user");

@@ -5,7 +5,8 @@ export default function ProfileSteps({ currentStep = 0 }) {
     <ol className="steps" aria-label="Profile completion">
       {steps.map((step, index) => (
         <li className={index <= currentStep ? "step step-active" : "step"} key={step}>
-          <span>{index + 1}</span>{step}
+          <span>{index + 1}</span>
+          {step}
         </li>
       ))}
     </ol>

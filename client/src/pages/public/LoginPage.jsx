@@ -8,7 +8,9 @@ export default function LoginPage() {
   return (
     <main className="auth-page">
       <section className="auth-card card">
-        <a className="brand brand-auth" href="/">SVIT <span>Gate Pass</span></a>
+        <a className="brand brand-auth" href="/">
+          SVIT <span>Gate Pass</span>
+        </a>
         <h1>Welcome back</h1>
         <p>Sign in to manage your campus gate passes.</p>
         <LoginForm />

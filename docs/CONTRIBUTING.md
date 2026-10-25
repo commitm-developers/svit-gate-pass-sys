@@ -30,15 +30,15 @@ This guide explains how we work so that seven people can build one product witho
 
 ## 1. Team and ownership
 
-| Role | Primary area |
-| --- | --- |
-| Tech Lead | Planning, reviews, CI, deployment, final merge to `main` |
-| Backend A | Auth, RBAC, users, admin-created security accounts |
-| Backend B | Gate pass model, state machine, QR signing, scan APIs, cron jobs |
-| Backend C | Profiles and uploads, dashboard APIs, reports, deployment support |
+| Role       | Primary area                                                       |
+| ---------- | ------------------------------------------------------------------ |
+| Tech Lead  | Planning, reviews, CI, deployment, final merge to `main`           |
+| Backend A  | Auth, RBAC, users, admin-created security accounts                 |
+| Backend B  | Gate pass model, state machine, QR signing, scan APIs, cron jobs   |
+| Backend C  | Profiles and uploads, dashboard APIs, reports, deployment support  |
 | Frontend A | App shell, auth pages, route guards, profile forms, camera capture |
-| Frontend B | Gate pass form and card, history, student dashboard and charts |
-| Frontend C | Security scanner, verification card, admin and security dashboard |
+| Frontend B | Gate pass form and card, history, student dashboard and charts     |
+| Frontend C | Security scanner, verification card, admin and security dashboard  |
 
 Ownership is about who to ask first, not who is allowed to touch code. Anyone may fix a bug anywhere through a normal PR.
 
@@ -47,31 +47,182 @@ Ownership is about who to ask first, not who is allowed to touch code. Anyone ma
 One repository, two apps:
 
 ```
-svit-gate-pass/
-├── client/                 # React (Vite) + Tailwind
-│   └── src/
-│       ├── components/     # Reusable UI (Button, Modal, StatusBadge...)
-│       ├── features/       # auth, profile, gatepass, scanner, dashboard
-│       ├── pages/
-│       ├── hooks/
-│       ├── services/       # Axios API wrappers
-│       └── utils/
-├── server/                 # Node + Express + Mongoose
-│   └── src/
-│       ├── config/
-│       ├── models/
-│       ├── routes/
-│       ├── controllers/
-│       ├── services/       # Business logic (pass state machine, QR signing)
-│       ├── middleware/     # auth, rbac, validate, error handler
-│       ├── jobs/           # cron: expire passes, flag overdue
-│       └── utils/
-├── docs/                   # PRD and design notes
-├── .github/                # Issue templates, PR template, CI workflows
-└── CONTRIBUTING.md
+svit-gate-pass-sys/
+├── .github/                      # templates, workflows, CODEOWNERS
+├── docs/
+│   ├── PRD.docx
+│   ├── api.md                    # API contracts
+│   └── deployment.md
+├── scripts/                      # create-labels.sh, create-issues.sh
+├── client/                       # React app (neeche detail)
+├── server/                       # Node API (neeche detail)
+├── docker-compose.yml            # local: api + web (+ mongo)
+├── .gitignore
+├── .editorconfig
+├── CONTRIBUTING.md
+├── README.md
+└── LICENSE
+```
+
+Server (Node + Express + Mongoose):
+
+```
+server/
+├── src/
+│   ├── config/
+│   │   ├── env.js                # env load + validate (fail fast)
+│   │   ├── db.js                 # Mongo connection
+│   │   ├── cloudinary.js         # file storage client
+│   │   └── cors.js
+│   ├── constants/
+│   │   ├── roles.js              # student, admin, security
+│   │   ├── passStatus.js         # GENERATED, OUT, OVERDUE, RETURNED, EXPIRED, CANCELLED
+│   │   └── errorCodes.js         # PASS_EXPIRED, QR_INVALID ...
+│   ├── models/
+│   │   ├── User.model.js
+│   │   ├── StudentProfile.model.js
+│   │   ├── StaffProfile.model.js
+│   │   ├── GatePass.model.js
+│   │   ├── ScanLog.model.js
+│   │   └── Setting.model.js
+│   ├── routes/
+│   │   ├── index.js              # mounts everything under /api/v1
+│   │   ├── auth.routes.js
+│   │   ├── admin.routes.js
+│   │   ├── student.routes.js
+│   │   ├── staff.routes.js
+│   │   ├── gatepass.routes.js
+│   │   ├── scan.routes.js
+│   │   ├── dashboard.routes.js
+│   │   └── report.routes.js
+│   ├── controllers/              # request in, response out (no logic)
+│   │   ├── auth.controller.js
+│   │   ├── admin.controller.js
+│   │   ├── student.controller.js
+│   │   ├── staff.controller.js
+│   │   ├── gatepass.controller.js
+│   │   ├── scan.controller.js
+│   │   ├── dashboard.controller.js
+│   │   └── report.controller.js
+│   ├── services/                 # business logic lives here
+│   │   ├── auth.service.js
+│   │   ├── profile.service.js
+│   │   ├── gatepass.service.js
+│   │   ├── passStateMachine.service.js   # only place that changes status
+│   │   ├── qr.service.js                 # sign + verify QR token
+│   │   ├── scan.service.js
+│   │   ├── dashboard.service.js
+│   │   ├── upload.service.js
+│   │   └── mail.service.js
+│   ├── middleware/
+│   │   ├── auth.middleware.js    # verify JWT cookie
+│   │   ├── rbac.middleware.js    # allowRoles('security','admin')
+│   │   ├── validate.middleware.js
+│   │   ├── upload.middleware.js  # multer rules
+│   │   ├── rateLimit.middleware.js
+│   │   ├── notFound.middleware.js
+│   │   └── error.middleware.js   # central error handler
+│   ├── validators/               # Zod schemas
+│   │   ├── auth.validator.js
+│   │   ├── profile.validator.js
+│   │   └── gatepass.validator.js
+│   ├── jobs/
+│   │   └── passExpiry.job.js     # cron: expire + overdue
+│   ├── utils/
+│   │   ├── AppError.js
+│   │   ├── asyncHandler.js
+│   │   ├── passNumber.js         # GP-YYMM-0001
+│   │   ├── dates.js              # IST day/week boundaries
+│   │   └── logger.js
+│   ├── app.js                    # express app (helmet, cors, routes)
+│   └── server.js                 # starts DB, cron, listens
+├── tests/
+│   ├── unit/                     # state machine, qr.service
+│   ├── integration/              # supertest: auth, pass, scan
+│   └── setup.js
+├── seeds/
+│   ├── seedAdmin.js
+│   └── seedDemo.js
+├── .env.example
+├── .eslintrc.cjs
+├── .prettierrc
+├── Dockerfile
+├── package.json
+└── package-lock.json
+```
+
+Request ka flow: route → middleware (auth, role, validate) → controller → service → model.
+
+Client (React + Vite + Tailwind):
+
+```
+client/
+├── public/
+│   └── favicon.ico
+├── src/
+│   ├── app/
+│   │   ├── App.jsx
+│   │   ├── router.jsx            # all routes
+│   │   └── providers.jsx         # QueryClient, AuthProvider, Toaster
+│   ├── routes/
+│   │   ├── ProtectedRoute.jsx    # login check
+│   │   └── RoleRoute.jsx         # role check
+│   ├── components/
+│   │   ├── ui/                   # Button, Input, Modal, Table, Loader, StatusBadge
+│   │   ├── layout/               # Navbar, Sidebar, PageHeader, AppLayout
+│   │   └── common/               # EmptyState, ErrorState, ConfirmDialog
+│   ├── features/
+│   │   ├── auth/
+│   │   │   ├── components/       # LoginForm, RegisterForm
+│   │   │   ├── hooks/            # useAuth
+│   │   │   ├── api.js
+│   │   │   └── AuthContext.jsx
+│   │   ├── profile/
+│   │   │   ├── components/       # ProfileSteps, CameraCapture, CertificateUpload
+│   │   │   ├── hooks/
+│   │   │   └── api.js
+│   │   ├── gatepass/
+│   │   │   ├── components/       # PassForm, PassCard, QrView, PassHistory, StatusProgress
+│   │   │   ├── hooks/
+│   │   │   └── api.js
+│   │   ├── scanner/
+│   │   │   ├── components/       # QrScanner, StudentVerifyCard, ScanErrors, ManualSearch
+│   │   │   ├── hooks/
+│   │   │   └── api.js
+│   │   ├── dashboard/
+│   │   │   ├── components/       # StatCard, WeeklyChart, MonthlyChart, TimelineChart, OutNowTable
+│   │   │   ├── hooks/
+│   │   │   └── api.js
+│   │   └── admin/
+│   │       ├── components/       # SecurityList, SecurityForm, StudentList
+│   │       └── api.js
+│   ├── pages/
+│   │   ├── public/               # LoginPage, RegisterPage, NotFoundPage
+│   │   ├── student/              # StudentDashboardPage, ProfilePage, CreatePassPage, HistoryPage
+│   │   ├── security/             # ScannerPage, StaffDashboardPage, SecurityProfilePage
+│   │   └── admin/                # AdminDashboardPage, StudentsPage, SecurityStaffPage
+│   ├── services/
+│   │   └── axios.js              # base instance, 401 handling
+│   ├── hooks/                    # useDebounce, useInterval, useCamera
+│   ├── utils/                    # formatDate (IST), cn, validators
+│   ├── constants/                # roles, passStatus, routes
+│   ├── styles/
+│   │   └── index.css             # Tailwind layers
+│   └── main.jsx
+├── tests/
+├── .env.example
+├── index.html
+├── vite.config.js
+├── tailwind.config.js
+├── postcss.config.js
+├── .eslintrc.cjs
+├── Dockerfile                    # build + nginx
+├── package.json
+└── package-lock.json
 ```
 
 Rules of thumb:
+
 - Business logic goes in `services/`, not in route handlers or React components.
 - Keep one feature's files together under `features/` on the client.
 
@@ -81,7 +232,7 @@ Rules of thumb:
 
 ```bash
 git clone <repo-url>
-cd svit-gate-pass
+cd svit-gate-pass-sys
 
 # Backend
 cd server
@@ -140,12 +291,12 @@ Format: `AREA-TRACK-NN`, for example `AUTH-BE-02`, `GP-FE-01`, `SCAN-BE-03`. App
 
 ### Labels
 
-| Group | Labels |
-| --- | --- |
-| Type | `feature`, `bug`, `chore`, `spike`, `docs` |
-| Area | `frontend`, `backend`, `devops` |
-| Priority | `P0` (must have for MVP), `P1` (should have) |
-| Epic | `E0` setup, `E1` auth, `E2` profiles, `E3` gate pass, `E4` scanner, `E5` dashboards, `E6` QA |
+| Group    | Labels                                                                                       |
+| -------- | -------------------------------------------------------------------------------------------- |
+| Type     | `feature`, `bug`, `chore`, `spike`, `docs`                                                   |
+| Area     | `frontend`, `backend`, `devops`                                                              |
+| Priority | `P0` (must have for MVP), `P1` (should have)                                                 |
+| Epic     | `E0` setup, `E1` auth, `E2` profiles, `E3` gate pass, `E4` scanner, `E5` dashboards, `E6` QA |
 
 ### Board columns
 
@@ -153,11 +304,11 @@ Format: `AREA-TRACK-NN`, for example `AUTH-BE-02`, `GP-FE-01`, `SCAN-BE-03`. App
 
 ### Sizing
 
-| Size | Effort |
-| --- | --- |
-| S | up to 1 day |
-| M | 2 days |
-| L | 3 days |
+| Size | Effort      |
+| ---- | ----------- |
+| S    | up to 1 day |
+| M    | 2 days      |
+| L    | 3 days      |
 
 If an issue is bigger than L, split it and tell the Lead.
 
@@ -167,13 +318,13 @@ The **API contract** (route, request body, response, error codes) is written in 
 
 ## 5. Branching strategy
 
-| Branch | Purpose |
-| --- | --- |
-| `main` | Stable, deployable. Only the Lead merges from `develop` at release. |
-| `develop` | Integration branch. All feature PRs target this. |
-| `feature/<ISSUE-ID>-short-name` | One branch per issue |
-| `fix/<ISSUE-ID>-short-name` | Bug fixes |
-| `hotfix/<short-name>` | Urgent fixes for `main` (Lead only) |
+| Branch                          | Purpose                                                             |
+| ------------------------------- | ------------------------------------------------------------------- |
+| `main`                          | Stable, deployable. Only the Lead merges from `develop` at release. |
+| `develop`                       | Integration branch. All feature PRs target this.                    |
+| `feature/<ISSUE-ID>-short-name` | One branch per issue                                                |
+| `fix/<ISSUE-ID>-short-name`     | Bug fixes                                                           |
+| `hotfix/<short-name>`           | Urgent fixes for `main` (Lead only)                                 |
 
 Examples:
 
@@ -197,6 +348,7 @@ git push -u origin feature/GP-BE-02-create-pass-api
 ```
 
 Rules:
+
 - Never push directly to `main` or `develop`. Branch protection is on.
 - Keep branches short-lived (target: merged within 3 days).
 - Do not mix two issues in one branch.
@@ -238,7 +390,6 @@ Keep the summary under 72 characters. Make small, meaningful commits.
 3. Fill in the PR template completely:
    - What changed and why
    - Link to the issue (`Closes #<number>`)
-   - Screenshots or a short recording for any UI change (mobile and desktop)
    - How to test it
    - Checklist (below)
 4. Move the issue card to **In review** and request a reviewer.
@@ -260,12 +411,14 @@ Keep the summary under 72 characters. Make small, meaningful commits.
 ## 8. Code review
 
 For reviewers:
+
 - Aim to review within **one working day**.
 - Check correctness against the acceptance criteria first, then security, then readability.
 - Be specific and kind. Say what to change and why. Use `nit:` for optional style points.
 - Approve only when you would be comfortable maintaining the code.
 
 For authors:
+
 - Reply to every comment, then push fixes. Do not resolve a thread you did not address.
 - Disagree politely with reasons. If stuck, ask the Lead to decide.
 
@@ -274,6 +427,7 @@ For authors:
 ## 9. Coding standards
 
 ### General
+
 - JavaScript (ES modules), `async/await`, no callbacks pyramids.
 - ESLint and Prettier are mandatory. Run `npm run lint` and `npm run format` before pushing. Husky runs checks on commit.
 - Names: `camelCase` for variables and functions, `PascalCase` for React components and Mongoose models, `UPPER_SNAKE_CASE` for constants, `kebab-case` for folders (except component folders).
@@ -282,6 +436,7 @@ For authors:
 - Comments explain **why**, not what.
 
 ### Backend
+
 - Controllers parse input and send responses. Services hold logic. Models hold schema only.
 - Validate every request body, query and param with Zod (or the agreed library) in middleware.
 - Use one central error handler. Throw typed errors (`AppError(status, code, message)`); never leak stack traces to clients.
@@ -291,6 +446,7 @@ For authors:
 - Store times in **UTC**; the client formats them as IST.
 
 ### Frontend
+
 - Function components and hooks only.
 - Server data via TanStack Query (or the agreed data layer); local UI state via `useState`/`useReducer`.
 - Keep API calls in `services/`, never inside JSX files directly.
@@ -305,7 +461,7 @@ For authors:
 - Standard success shape:
 
 ```json
-{ "success": true, "data": { } }
+{ "success": true, "data": {} }
 ```
 
 - Standard error shape:
@@ -337,13 +493,14 @@ This app stores student and parent personal data and controls who may leave the 
 
 ## 12. Testing
 
-| Level | Tool | What to cover |
-| --- | --- | --- |
-| Unit | Jest (backend), Vitest (frontend) | Pass state machine, date validation, QR signing and verification, utility functions |
-| Integration | Jest + Supertest | Auth, create pass, verify, exit, entry, dashboards |
-| End to end | Playwright or Cypress | Student creates pass → security scans → exit → entry → QR expires |
+| Level       | Tool                                | What to cover                                                                       |
+| ----------- | ----------------------------------- | ----------------------------------------------------------------------------------- |
+| Unit        | Vitest (backend), Vitest (frontend) | Pass state machine, date validation, QR signing and verification, utility functions |
+| Integration | Jest + Supertest                    | Auth, create pass, verify, exit, entry, dashboards                                  |
+| End to end  | Playwright or Cypress               | Student creates pass → security scans → exit → entry → QR expires                   |
 
 Expectations:
+
 - New business logic comes with tests in the same PR.
 - Bug fixes include a test that fails before the fix.
 - Must-have cases for passes: expired QR, already used QR, cancelled pass, tampered token, second exit scan, entry before exit, wrong role.

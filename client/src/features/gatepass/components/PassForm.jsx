@@ -23,10 +23,22 @@ export default function PassForm() {
 
   return (
     <form className="form-stack card" onSubmit={submit}>
-      <Input label="Reason for leaving" required value={reason} onChange={(event) => setReason(event.target.value)} />
-      <Input label="Expected return" type="datetime-local" required value={expectedReturn}
-        onChange={(event) => setExpectedReturn(event.target.value)} />
-      <Button disabled={createPass.isPending}>{createPass.isPending ? "Submitting..." : "Request gate pass"}</Button>
+      <Input
+        label="Reason for leaving"
+        required
+        value={reason}
+        onChange={(event) => setReason(event.target.value)}
+      />
+      <Input
+        label="Expected return"
+        type="datetime-local"
+        required
+        value={expectedReturn}
+        onChange={(event) => setExpectedReturn(event.target.value)}
+      />
+      <Button disabled={createPass.isPending}>
+        {createPass.isPending ? "Submitting..." : "Request gate pass"}
+      </Button>
     </form>
   );
 }

@@ -16,17 +16,28 @@ export default function SecurityStaffPage() {
       queryClient.invalidateQueries({ queryKey: ["admin", "security-staff"] });
       toast.success("Security staff account created.");
     },
-    onError: (error) => toast.error(error.response?.data?.message || "Could not add security staff."),
+    onError: (error) =>
+      toast.error(error.response?.data?.message || "Could not add security staff."),
   });
   return (
     <>
-      <PageHeader title="Security staff" description="Manage staff accounts with campus pass verification access." />
-      <section className="content-section card"><h2>Add staff member</h2><SecurityForm onSubmit={(staff) => createStaff.mutate(staff)} /></section>
+      <PageHeader
+        title="Security staff"
+        description="Manage staff accounts with campus pass verification access."
+      />
+      <section className="content-section card">
+        <h2>Add staff member</h2>
+        <SecurityForm onSubmit={(staff) => createStaff.mutate(staff)} />
+      </section>
       <section className="content-section">
         <h2>Staff accounts</h2>
-        {query.isLoading ? <Loader label="Loading staff..." /> : query.isError
-          ? <ErrorState message="Staff list could not be loaded." onRetry={query.refetch} />
-          : <SecurityList staff={Array.isArray(query.data) ? query.data : query.data?.staff || []} />}
+        {query.isLoading ? (
+          <Loader label="Loading staff..." />
+        ) : query.isError ? (
+          <ErrorState message="Staff list could not be loaded." onRetry={query.refetch} />
+        ) : (
+          <SecurityList staff={Array.isArray(query.data) ? query.data : query.data?.staff || []} />
+        )}
       </section>
     </>
   );

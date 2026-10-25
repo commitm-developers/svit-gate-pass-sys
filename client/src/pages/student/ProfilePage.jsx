@@ -13,7 +13,10 @@ export default function ProfilePage() {
         <ProfileSteps />
         <h2>{user?.name || "Student profile"}</h2>
         <p>{user?.email}</p>
-        <div className="profile-fields"><CameraCapture /><CertificateUpload /></div>
+        <div className="profile-fields">
+          <CameraCapture />
+          <CertificateUpload />
+        </div>
       </section>
     </>
   );

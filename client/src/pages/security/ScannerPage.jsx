@@ -14,9 +14,16 @@ export default function ScannerPage() {
   }
   return (
     <>
-      <PageHeader title="Verify a gate pass" description="Check a student's pass before allowing campus entry or exit." />
+      <PageHeader
+        title="Verify a gate pass"
+        description="Check a student's pass before allowing campus entry or exit."
+      />
       <QrScanner onScan={verify} />
-      {verification.isError && <ErrorState message={verification.error.response?.data?.message || "Pass verification failed."} />}
+      {verification.isError && (
+        <ErrorState
+          message={verification.error.response?.data?.message || "Pass verification failed."}
+        />
+      )}
       {result && <StudentVerifyCard result={result} />}
     </>
   );

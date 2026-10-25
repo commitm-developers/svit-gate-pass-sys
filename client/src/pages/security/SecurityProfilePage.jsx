@@ -6,7 +6,10 @@ export default function SecurityProfilePage() {
   return (
     <>
       <PageHeader title="Staff profile" description="Your security staff account details." />
-      <section className="card"><h2>{user?.name || "Security staff"}</h2><p>{user?.email}</p></section>
+      <section className="card">
+        <h2>{user?.name || "Security staff"}</h2>
+        <p>{user?.email}</p>
+      </section>
     </>
   );
 }

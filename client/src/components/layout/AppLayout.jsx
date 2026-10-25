@@ -10,7 +10,9 @@ export default function AppLayout() {
       <Navbar onMenuClick={() => setMenuOpen((open) => !open)} />
       <div className="app-body">
         <Sidebar open={menuOpen} onNavigate={() => setMenuOpen(false)} />
-        <main className="main-content"><Outlet /></main>
+        <main className="main-content">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
