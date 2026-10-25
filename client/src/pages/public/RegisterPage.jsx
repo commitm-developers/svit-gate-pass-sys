@@ -8,7 +8,9 @@ export default function RegisterPage() {
   return (
     <main className="auth-page">
       <section className="auth-card card">
-        <a className="brand brand-auth" href="/">SVIT <span>Gate Pass</span></a>
+        <a className="brand brand-auth" href="/">
+          SVIT <span>Gate Pass</span>
+        </a>
         <h1>Create your account</h1>
         <p>Register as a student to request and track gate passes.</p>
         <RegisterForm />

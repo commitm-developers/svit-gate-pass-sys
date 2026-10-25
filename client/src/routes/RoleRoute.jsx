@@ -4,5 +4,9 @@ import { useAuth } from "../features/auth/hooks/useAuth.js";
 
 export default function RoleRoute({ allowedRoles }) {
   const { user } = useAuth();
-  return allowedRoles.includes(user?.role) ? <Outlet /> : <Navigate to={ROUTES.NOT_FOUND} replace />;
+  return allowedRoles.includes(user?.role) ? (
+    <Outlet />
+  ) : (
+    <Navigate to={ROUTES.NOT_FOUND} replace />
+  );
 }

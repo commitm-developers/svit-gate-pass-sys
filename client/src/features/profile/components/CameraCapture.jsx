@@ -34,7 +34,13 @@ export default function CameraCapture({ onCapture }) {
     <div className="camera-capture">
       <video ref={videoRef} playsInline muted aria-label="Camera preview" />
       {error && <p className="field-error">{error}</p>}
-      {stream ? <Button onClick={capture}>Capture photo</Button> : <Button variant="secondary" onClick={startCamera}>Open camera</Button>}
+      {stream ? (
+        <Button onClick={capture}>Capture photo</Button>
+      ) : (
+        <Button variant="secondary" onClick={startCamera}>
+          Open camera
+        </Button>
+      )}
     </div>
   );
 }

@@ -20,7 +20,9 @@ export default function RegisterForm() {
       const user = await signUp(form);
       navigate(getHomeRoute(user.role), { replace: true });
     } catch (error) {
-      toast.error(error.response?.data?.message || "Unable to create your account. Please try again.");
+      toast.error(
+        error.response?.data?.message || "Unable to create your account. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -28,14 +30,36 @@ export default function RegisterForm() {
 
   return (
     <form className="form-stack" onSubmit={handleSubmit}>
-      <Input label="Full name" required autoComplete="name" value={form.name}
-        onChange={(event) => setForm({ ...form, name: event.target.value })} />
-      <Input label="Email address" type="email" required autoComplete="email" value={form.email}
-        onChange={(event) => setForm({ ...form, email: event.target.value })} />
-      <Input label="Password" type="password" minLength={8} required autoComplete="new-password" value={form.password}
-        onChange={(event) => setForm({ ...form, password: event.target.value })} />
-      <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Creating account..." : "Create account"}</Button>
-      <p className="form-note">Already registered? <Link to="/login">Sign in</Link></p>
+      <Input
+        label="Full name"
+        required
+        autoComplete="name"
+        value={form.name}
+        onChange={(event) => setForm({ ...form, name: event.target.value })}
+      />
+      <Input
+        label="Email address"
+        type="email"
+        required
+        autoComplete="email"
+        value={form.email}
+        onChange={(event) => setForm({ ...form, email: event.target.value })}
+      />
+      <Input
+        label="Password"
+        type="password"
+        minLength={8}
+        required
+        autoComplete="new-password"
+        value={form.password}
+        onChange={(event) => setForm({ ...form, password: event.target.value })}
+      />
+      <Button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Creating account..." : "Create account"}
+      </Button>
+      <p className="form-note">
+        Already registered? <Link to="/login">Sign in</Link>
+      </p>
     </form>
   );
 }

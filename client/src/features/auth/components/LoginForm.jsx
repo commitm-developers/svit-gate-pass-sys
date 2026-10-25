@@ -27,12 +27,28 @@ export default function LoginForm() {
 
   return (
     <form className="form-stack" onSubmit={handleSubmit}>
-      <Input label="Email address" type="email" autoComplete="email" required value={form.email}
-        onChange={(event) => setForm({ ...form, email: event.target.value })} />
-      <Input label="Password" type="password" autoComplete="current-password" required value={form.password}
-        onChange={(event) => setForm({ ...form, password: event.target.value })} />
-      <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Signing in..." : "Sign in"}</Button>
-      <p className="form-note">New to SVIT Gate Pass? <Link to="/register">Create an account</Link></p>
+      <Input
+        label="Email address"
+        type="email"
+        autoComplete="email"
+        required
+        value={form.email}
+        onChange={(event) => setForm({ ...form, email: event.target.value })}
+      />
+      <Input
+        label="Password"
+        type="password"
+        autoComplete="current-password"
+        required
+        value={form.password}
+        onChange={(event) => setForm({ ...form, password: event.target.value })}
+      />
+      <Button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Signing in..." : "Sign in"}
+      </Button>
+      <p className="form-note">
+        New to SVIT Gate Pass? <Link to="/register">Create an account</Link>
+      </p>
     </form>
   );
 }

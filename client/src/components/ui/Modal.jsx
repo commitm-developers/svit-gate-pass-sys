@@ -14,11 +14,20 @@ export default function Modal({ open, title, onClose, children }) {
 
   if (!open) return null;
   return (
-    <div className="modal-backdrop" role="presentation" onMouseDown={(event) => {
-      if (event.target === event.currentTarget) onClose?.();
-    }}>
+    <div
+      className="modal-backdrop"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose?.();
+      }}
+    >
       <section className="modal card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div className="row-between"><h2 id="modal-title">{title}</h2><Button variant="ghost" aria-label="Close" onClick={onClose}><X size={18} /></Button></div>
+        <div className="row-between">
+          <h2 id="modal-title">{title}</h2>
+          <Button variant="ghost" aria-label="Close" onClick={onClose}>
+            <X size={18} />
+          </Button>
+        </div>
         {children}
       </section>
     </div>
